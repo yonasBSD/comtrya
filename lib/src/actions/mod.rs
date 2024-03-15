@@ -27,7 +27,7 @@ use rhai::Engine;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-use tracing::{error, warn};
+use tracing::error;
 use user::add::UserAdd;
 
 use self::user::add_group::UserAddGroup;
@@ -228,8 +228,11 @@ impl<E: std::error::Error> From<E> for ActionError {
 
 pub trait Action {
     fn summarize(&self) -> String {
+        String::from("")
+        /*
         warn!("need to define action summarize");
         format!("not found action summarize")
+        */
     }
     fn plan(&self, manifest: &Manifest, context: &Contexts) -> anyhow::Result<Vec<Step>>;
 }
