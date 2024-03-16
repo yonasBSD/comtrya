@@ -7,7 +7,7 @@ license = "MIT"
 description = "Contains the interfaces for comtrya plugins"
 
 [dependencies]
-os_info = { version = "3.8", git = "https://github.com/yonasBSD/os_info", branch = "yonas-patch-1"}
+os_info = { git = "https://github.com/stanislav-tkach/os_info", rev = "452c3bc"}
 anyhow = "1.0"
 age = { version = "0.10", features = ["armor"] }
 dirs-next = "2.0"
