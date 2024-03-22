@@ -7,7 +7,7 @@ license = "MIT"
 description = "Contains the interfaces for comtrya plugins"
 
 [dependencies]
-os_info = { git = "https://github.com/stanislav-tkach/os_info", rev = "c6f8294"}
+os_info = "3.8.2"
 anyhow = "1.0"
 age = { version = "0.10", features = ["armor"] }
 dirs-next = "2.0"
