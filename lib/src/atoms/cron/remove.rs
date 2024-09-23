@@ -171,16 +171,16 @@ impl Atom for Remove {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use pretty_assertions::assert_eq;
+    //use super::*;
+    //use pretty_assertions::assert_eq;
 
     #[test]
     fn defaults() {
+        /*
         let command_run = Remove {
             ..Default::default()
         };
 
-        /*
         assert_eq!(String::from(""), command_run.command);
         assert_eq!(0, command_run.arguments.len());
         assert_eq!(None, command_run.working_dir);

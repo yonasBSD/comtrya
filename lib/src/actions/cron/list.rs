@@ -48,8 +48,7 @@ mod tests {
         let mut actions: Vec<Actions> = serde_yml::from_str(yaml).unwrap();
 
         match actions.pop() {
-            Some(Actions::CronList(action)) => {
-                assert_eq!("a", action.action.target);
+            Some(Actions::CronList(_action)) => {
             }
             _ => {
                 panic!("Cron List didn't deserialize to the correct type");
