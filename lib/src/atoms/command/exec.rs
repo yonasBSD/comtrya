@@ -49,6 +49,21 @@ impl Exec {
         }
     }
 
+    fn sudo_path(&self) -> anyhow::Result<String> {
+        match utilities::get_binary_path("sudo") {
+            Ok(path) => Ok(path),
+            Err(_) => match utilities::get_binary_path("doas") {
+                Ok(path) => Ok(path),
+                Err(err) => {
+                    return Err(anyhow!(
+                        "Command requires sudo, but neither sudo nor doas exists: {}",
+                        err
+                    ))
+                }
+            },
+        }
+    }
+
     fn elevate(&mut self) -> anyhow::Result<()> {
         tracing::info!(
             "Sudo required for privilege elevation to run `{} {}`. Validating sudo ...",
@@ -56,13 +71,29 @@ impl Exec {
             &self.arguments.join(" ")
         );
 
-        match std::process::Command::new("sudo")
-            .stdin(std::process::Stdio::inherit())
-            .stdout(std::process::Stdio::inherit())
-            .stderr(std::process::Stdio::inherit())
-            .arg("--validate")
-            .output()
-        {
+        let path = self.sudo_path().unwrap();
+        let mut command: std::process::Command;
+
+        if path.ends_with("sudo") {
+            command = std::process::Command::new(path);
+            command
+                .stdin(std::process::Stdio::inherit())
+                .stdout(std::process::Stdio::inherit())
+                .stderr(std::process::Stdio::inherit())
+                .arg("--validate")
+        } else if path.ends_with("doas") {
+            command = std::process::Command::new(path);
+            command
+                .stdin(std::process::Stdio::inherit())
+                .stdout(std::process::Stdio::inherit())
+                .stderr(std::process::Stdio::inherit())
+                .arg("-n")
+                .arg("whoami")
+        } else {
+            return Err(anyhow!("Unsupported sudo {}", path));
+        };
+
+        match command.output() {
             Ok(std::process::Output { status, .. }) if status.success() => Ok(()),
 
             Ok(std::process::Output { stderr, .. }) => Err(anyhow!(
@@ -105,20 +136,22 @@ impl Atom for Exec {
     }
 
     fn execute(&mut self) -> anyhow::Result<()> {
-        let (command, arguments) = self.elevate_if_required();
-
-        let command = utilities::get_binary_path(&command)
-            .or_else(|_| Err(anyhow!("Command `{}` not found in path", command)))?;
+        let (mut command, arguments) = self.elevate_if_required();
 
         // If we require root, we need to use sudo with inherited IO
         // to ensure the user can respond if prompted for a password
         if command.eq("sudo") {
+            command = self.sudo_path().unwrap();
+
             match self.elevate() {
                 Ok(_) => (),
                 Err(err) => {
                     return Err(anyhow!(err));
                 }
             }
+        } else {
+            command = utilities::get_binary_path(&command)
+                .or_else(|_| Err(anyhow!("Command `{}` not found in path", command)))?;
         }
 
         match std::process::Command::new(&command)
