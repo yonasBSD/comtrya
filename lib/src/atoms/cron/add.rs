@@ -5,12 +5,15 @@ use super::super::Atom;
 use anyhow::anyhow;
 use tracing::debug;
 
+use croner::Cron;
+use chrono::Local;
 use english_to_cron::str_cron_syntax;
 
 #[derive(Default)]
 pub struct Add {
     pub name: Option<String>,
     pub description: Option<String>,
+    pub command: String,
     pub schedule: String,
     pub user: Option<String>,
     pub privileged: Option<bool>,
@@ -84,8 +87,8 @@ impl std::fmt::Display for Add {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "CommandAdd with: privileged={:#?}: {:#?} ({:#?}) :: {:#?}",
-            self.privileged, self.name, self.description, self.schedule,
+            "CommandAdd with: privileged={:#?}: {:#?} ({:#?}) :: {:#?} {:#?} ",
+            self.privileged, self.name, self.description, self.schedule, self.command
         )
     }
 }
@@ -105,19 +108,44 @@ impl Atom for Add {
     }
 
     fn execute(&mut self) -> anyhow::Result<()> {
-        let _schedule = match str_cron_syntax(&self.schedule) {
+        // Parse cron expression
+        let schedule = match str_cron_syntax(&self.schedule) {
             Ok(schedule) => {
                 debug!("{}", schedule);
                 schedule
             },
+            Err(_err) => {
+                match Cron::new(&self.schedule).parse() {
+                    Ok(schedule) => {
+                        debug!("{}", schedule.pattern.to_string());
+                        schedule.pattern.to_string()
+                    },
+                    Err(err) => {
+                        return Err(anyhow!(
+                                "Invalid schedule: {}",
+                                err
+                        ))
+                    }
+                }
+            }
+        };
+
+        let cron = match Cron::new(&schedule).parse() {
+            Ok(cron) => cron,
             Err(err) => {
                 return Err(anyhow!(
-                    "Invalid schedule {}",
-                    err
+                        "Invalid schedule: {}",
+                        err
                 ))
             }
         };
 
+        // Get next match
+        let time = Local::now();
+        let next = cron.find_next_occurrence(&time, false).unwrap();
+        println!("Schedule \"{}\" ({}) to run {} will match next time at {}", &self.schedule, schedule, &self.command, next);
+
+        // TODO: Run `crontab /tmp/this-cron-entry.cron`
         Ok(())
 
         /*

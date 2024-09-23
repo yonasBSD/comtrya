@@ -486,6 +486,7 @@ version = "0.8.9"
 dependencies = [
  "age",
  "anyhow",
+ "chrono",
  "croner",
  "dirs-next",
  "english-to-cron",

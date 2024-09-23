@@ -8,6 +8,7 @@ use crate::{actions::Action, steps::Step};
 pub struct CronAdd {
     pub name: Option<String>,
     pub description: Option<String>,
+    pub command: String,
     pub schedule: String,
     pub user: Option<String>,
     pub privileged: Option<bool>,
@@ -17,7 +18,7 @@ impl CronAdd {}
 
 impl Action for CronAdd {
     fn summarize(&self) -> String {
-        format!("Add cron item {} ({}: {})", self.schedule, self.name.clone().unwrap_or_default(), self.description.clone().unwrap_or_default())
+        format!("Add cron item {} {} ({}: {})", self.schedule, self.command, self.name.clone().unwrap_or_default(), self.description.clone().unwrap_or_default())
     }
 
     fn plan(
@@ -29,6 +30,7 @@ impl Action for CronAdd {
             atom: Box::new(AddCronAtom {
                 name: self.name.clone(),
                 description: self.description.clone(),
+                command: self.command.clone(),
                 schedule: self.schedule.clone(),
                 user: self.user.clone(),
                 privileged: self.privileged,
@@ -49,14 +51,16 @@ mod tests {
     fn it_can_be_deserialized() {
         let yaml = r#"
 - action: cron.add
-  schedule: 00 00 * * * * script.sh
+  command: script.sh
+  schedule: 00 00 * * * *
 "#;
 
         let mut actions: Vec<Actions> = serde_yml::from_str(yaml).unwrap();
 
         match actions.pop() {
             Some(Actions::CronAdd(action)) => {
-                assert_eq!("00 00 * * * * script.sh", action.action.schedule);
+                assert_eq!("script.sh", action.action.command);
+                assert_eq!("00 00 * * * *", action.action.schedule);
             }
             _ => {
                 panic!("Cron Add didn't deserialize to the correct type");
