@@ -1,5 +1,6 @@
 mod binary;
 mod command;
+mod cron;
 mod directory;
 mod file;
 mod group;
@@ -13,6 +14,7 @@ use crate::steps::Step;
 use anyhow::anyhow;
 use binary::BinaryGitHub;
 use command::run::RunCommand;
+use cron::{CronAdd, CronRemove, CronList};
 use directory::{DirectoryCopy, DirectoryCreate, DirectoryRemove};
 use file::copy::FileCopy;
 use file::download::FileDownload;
@@ -105,6 +107,15 @@ pub enum Actions {
     #[serde(rename = "command.run", alias = "cmd.run")]
     CommandRun(ConditionalVariantAction<RunCommand>),
 
+    #[serde(rename = "cron.create")]
+    CronAdd(ConditionalVariantAction<CronAdd>),
+
+    #[serde(rename = "cron.remove")]
+    CronRemove(ConditionalVariantAction<CronRemove>),
+
+    #[serde(rename = "cron.list")]
+    CronList(ConditionalVariantAction<CronList>),
+
     #[serde(rename = "directory.copy", alias = "dir.copy")]
     DirectoryCopy(ConditionalVariantAction<DirectoryCopy>),
 
@@ -158,6 +169,9 @@ impl Actions {
         match self {
             Actions::BinaryGitHub(a) => a,
             Actions::CommandRun(a) => a,
+            Actions::CronAdd(a) => a,
+            Actions::CronRemove(a) => a,
+            Actions::CronList(a) => a,
             Actions::DirectoryCopy(a) => a,
             Actions::DirectoryCreate(a) => a,
             Actions::FileCopy(a) => a,
@@ -179,6 +193,9 @@ impl Display for Actions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = match self {
             Actions::CommandRun(_) => "command.run",
+            Actions::CronAdd(_) => "cron.create",
+            Actions::CronRemove(_) => "cron.remove",
+            Actions::CronList(_) => "cron.list",
             Actions::DirectoryCopy(_) => "directory.copy",
             Actions::DirectoryCreate(_) => "directory.create",
             Actions::FileCopy(_) => "file.copy",
