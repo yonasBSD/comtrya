@@ -54,7 +54,7 @@ mod tests {
 
         match actions.pop() {
             Some(Actions::CronRemove(action)) => {
-                assert_eq!("a", action.action.target);
+                assert_eq!("00 00 * * * * script.sh", action.action.schedule);
             }
             _ => {
                 panic!("Cron Remove didn't deserialize to the correct type");
