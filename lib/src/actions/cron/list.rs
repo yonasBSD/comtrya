@@ -6,14 +6,15 @@ use crate::{actions::Action, steps::Step};
 
 #[derive(JsonSchema, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CronList {
-    pub user: String,
+    pub user: Option<String>,
+    pub privileged: Option<bool>,
 }
 
 impl CronList {}
 
 impl Action for CronList {
     fn summarize(&self) -> String {
-        format!("List cron for user {}", self.user)
+        format!("List cron for user {:#?}", self.user.clone().unwrap_or_default())
     }
 
     fn plan(
@@ -21,11 +22,11 @@ impl Action for CronList {
         _manifest: &crate::manifests::Manifest,
         _context: &crate::contexts::Contexts,
     ) -> anyhow::Result<Vec<crate::steps::Step>> {
-        let user = String::from("");
-        let privileged = false;
-
         let steps = vec![Step {
-            atom: Box::new(ListCronAtom { user: Some(user), privileged: Some(privileged) }),
+            atom: Box::new(ListCronAtom {
+                user: self.user.clone(),
+                privileged: self.privileged,
+            }),
             initializers: vec![],
             finalizers: vec![],
         }];

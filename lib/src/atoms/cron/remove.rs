@@ -8,7 +8,7 @@ use super::super::Atom;
 #[derive(Default)]
 pub struct Remove {
     pub name: Option<String>,
-    pub schedule: Option<String>,
+    pub schedule: String,
     pub user: Option<String>,
     pub privileged: Option<bool>,
 }
@@ -25,7 +25,7 @@ pub fn new_run_command(command: String) -> Remove {
 
 impl Remove {
     fn elevate_if_required(&self) -> (String, Vec<String>) {
-         (String::from(""), vec![String::from("")])
+        (String::from(""), vec![String::from("")])
         /*
         // Depending on the priviledged flag and who who the current user is
         // we can determine if we need to prepend sudo to the command
@@ -81,10 +81,8 @@ impl std::fmt::Display for Remove {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "CommandRemove with: privileged={:#?}: {:#?} {:#?}",
-            self.privileged,
-            self.name,
-            self.schedule
+            "CommandRemove with: privileged={:#?}: {:#?} {}",
+            self.privileged, self.name, self.schedule
         )
     }
 }

@@ -14,7 +14,7 @@ use crate::steps::Step;
 use anyhow::anyhow;
 use binary::BinaryGitHub;
 use command::run::RunCommand;
-use cron::{CronAdd, CronRemove, CronList};
+use cron::{CronAdd, CronList, CronRemove};
 use directory::{DirectoryCopy, DirectoryCreate, DirectoryRemove};
 use file::copy::FileCopy;
 use file::download::FileDownload;
@@ -107,7 +107,7 @@ pub enum Actions {
     #[serde(rename = "command.run", alias = "cmd.run")]
     CommandRun(ConditionalVariantAction<RunCommand>),
 
-    #[serde(rename = "cron.create")]
+    #[serde(rename = "cron.add")]
     CronAdd(ConditionalVariantAction<CronAdd>),
 
     #[serde(rename = "cron.remove")]
@@ -193,7 +193,7 @@ impl Display for Actions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = match self {
             Actions::CommandRun(_) => "command.run",
-            Actions::CronAdd(_) => "cron.create",
+            Actions::CronAdd(_) => "cron.add",
             Actions::CronRemove(_) => "cron.remove",
             Actions::CronList(_) => "cron.list",
             Actions::DirectoryCopy(_) => "directory.copy",

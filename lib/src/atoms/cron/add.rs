@@ -83,10 +83,7 @@ impl std::fmt::Display for Add {
         write!(
             f,
             "CommandAdd with: privileged={:#?}: {:#?} ({:#?}) :: {:#?}",
-            self.privileged,
-            self.name,
-            self.description,
-            self.schedule,
+            self.privileged, self.name, self.description, self.schedule,
         )
     }
 }

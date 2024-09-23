@@ -6,9 +6,10 @@ use crate::{actions::Action, steps::Step};
 
 #[derive(JsonSchema, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CronRemove {
-    pub name: String,
-    pub user: String,
+    pub name: Option<String>,
+    pub user: Option<String>,
     pub schedule: String,
+    pub privileged: Option<bool>,
 }
 
 impl CronRemove {}
@@ -23,13 +24,13 @@ impl Action for CronRemove {
         _manifest: &crate::manifests::Manifest,
         _context: &crate::contexts::Contexts,
     ) -> anyhow::Result<Vec<crate::steps::Step>> {
-        let name = String::from("");
-        let schedule = String::from("");
-        let user = String::from("");
-        let privileged = false;
-
         let steps = vec![Step {
-            atom: Box::new(RemoveCronAtom { name: Some(name), schedule: Some(schedule), user: Some(user), privileged: Some(privileged) }),
+            atom: Box::new(RemoveCronAtom {
+                name: self.name.clone(),
+                schedule: self.schedule.clone(),
+                user: self.user.clone(),
+                privileged: self.privileged,
+            }),
             initializers: vec![],
             finalizers: vec![],
         }];

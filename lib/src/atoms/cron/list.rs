@@ -80,8 +80,7 @@ impl std::fmt::Display for List {
         write!(
             f,
             "CommandList with: privileged={:#?}: {:#?}",
-            self.privileged,
-            self.user,
+            self.privileged, self.user,
         )
     }
 }

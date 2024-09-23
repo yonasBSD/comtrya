@@ -1,7 +1,7 @@
 pub mod add;
-pub mod remove;
 pub mod list;
+pub mod remove;
 
 pub use add::CronAdd;
-pub use remove::CronRemove;
 pub use list::CronList;
+pub use remove::CronRemove;

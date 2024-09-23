@@ -6,18 +6,18 @@ use crate::{actions::Action, steps::Step};
 
 #[derive(JsonSchema, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CronAdd {
-    pub name: String,
-    pub description: String,
+    pub name: Option<String>,
+    pub description: Option<String>,
     pub schedule: String,
-    pub user: String,
-    pub privileged: bool,
+    pub user: Option<String>,
+    pub privileged: Option<bool>,
 }
 
 impl CronAdd {}
 
 impl Action for CronAdd {
     fn summarize(&self) -> String {
-        format!("Add cron item {}", self.schedule)
+        format!("Add cron item {} ({}: {})", self.schedule, self.name.clone().unwrap_or_default(), self.description.clone().unwrap_or_default())
     }
 
     fn plan(
@@ -26,7 +26,13 @@ impl Action for CronAdd {
         _context: &crate::contexts::Contexts,
     ) -> anyhow::Result<Vec<crate::steps::Step>> {
         let steps = vec![Step {
-            atom: Box::new(AddCronAtom { name: Some(self.name.clone()), description: Some(self.description.clone()), schedule: self.schedule.clone(), user: Some(self.user.clone()), privileged: Some(self.privileged) }),
+            atom: Box::new(AddCronAtom {
+                name: self.name.clone(),
+                description: self.description.clone(),
+                schedule: self.schedule.clone(),
+                user: self.user.clone(),
+                privileged: self.privileged,
+            }),
             initializers: vec![],
             finalizers: vec![],
         }];

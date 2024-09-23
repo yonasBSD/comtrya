@@ -1,7 +1,7 @@
 mod add;
-mod remove;
 mod list;
+mod remove;
 
 pub use add::Add;
-pub use remove::Remove;
 pub use list::List;
+pub use remove::Remove;
