@@ -3,7 +3,9 @@ use crate::atoms::Outcome;
 use super::super::Atom;
 //use crate::utilities;
 //use anyhow::anyhow;
-//use tracing::debug;
+use tracing::debug;
+
+use english_to_cron::str_cron_syntax;
 
 #[derive(Default)]
 pub struct Remove {
@@ -102,6 +104,7 @@ impl Atom for Remove {
     }
 
     fn execute(&mut self) -> anyhow::Result<()> {
+        debug!("{}", str_cron_syntax(&self.schedule).unwrap());
         Ok(())
         /*
         let (command, arguments) = self.elevate_if_required();
