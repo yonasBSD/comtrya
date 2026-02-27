@@ -141,8 +141,7 @@ pub fn lib_config(args: &GlobalArgs) -> anyhow::Result<Config> {
             // Panic early if an incorrect configuration path was specified by the user.
             if let Some(cfg_path) = &args.config_path {
                 return Err(anyhow!(
-                    "The user specified a file at {} but none exists.",
-                    cfg_path
+                    "The user specified a file at {cfg_path} but none exists."
                 ));
             }
 

@@ -47,8 +47,7 @@ impl Apply {
             Some(path) => path,
             None => {
                 return Err(anyhow::anyhow!(
-                    "Manifest location, {:?}, could be resolved",
-                    first_manifest_path
+                    "Manifest location, {first_manifest_path:?}, could be resolved"
                 ))
             }
         };
