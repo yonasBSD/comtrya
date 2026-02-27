@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> **We're looking for new maintainer(s)!** If you have the time and passion to breathe new life into Comtrya, check out [this issue](https://github.com/comtrya/comtrya/issues/598) for details.
+
 # Comtrya
 
 ![Comtrya](/Comtrya.gif "Hello")
